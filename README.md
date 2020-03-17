@@ -16,5 +16,8 @@ Likelihood function is a standard neural network regression model: a conditional
 **Burning Steps**
 Gibbs sampler is to be run for ~300 iterations, but the first 40 models is discarded to allow proper mixing. (MCMC algorithm is guaranteed to converge for large number of steps n, but this n is usually not known) 
 
-
-
+**References**
+1. Xiong - Bayesian prediction of tissue-regulated splicing using RNA sequence and cellular context https://academic.oup.com/bioinformatics/article/27/18/2554/182135
+2. Bishop - Pattern Recognition and Machine Learning https://cds.cern.ch/record/998831/files/9780387310732_TOC.pdf?source=post
+3. Neal - BAYESIAN LEARNING FOR NEURAL NETWORKS
+4. Blundell - Weight Uncertainty in Neural Network https://arxiv.org/pdf/1505.05424.pdf

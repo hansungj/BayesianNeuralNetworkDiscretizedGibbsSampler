@@ -11,7 +11,7 @@ Posterior probability for each weight value in [-5,5] by increments of 0.1. This
 Priors implemented in this project is "spike-and-slab" like mixture of normal distributions. Two normal distributions centered at zero with different scales is implemented. One normal component will have much smaller variance than the other allowing this component to be the “spike” part. This works as an automatic variable selection as it will set weights to zero unless backed by data. 
  
 **Likelihood Function**
-Likelihood function is a standard neural network regression model: a conditional distribution of y given the input x. This conditional distribution is a normal distribution.
+Likelihood function is a standard neural network regression model: a conditional distribution of target t given the input x P(t|y(x,w)). This conditional distribution is a normal distribution.
 
 **Burning Steps**
 Gibbs sampler is to be run for ~300 iterations, but the first 40 models is discarded to allow proper mixing. (MCMC algorithm is guaranteed to converge for large number of steps n, but this n is usually not known) 

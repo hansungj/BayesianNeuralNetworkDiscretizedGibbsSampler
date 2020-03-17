@@ -14,7 +14,7 @@ Priors implemented in this project is "spike-and-slab" like mixture of normal di
 Likelihood function is a standard neural network regression model: a conditional distribution of target t given the input x P(t|y(x,w)). This conditional distribution is a normal distribution.
 
 **Burning Steps**
-Gibbs sampler is to be run for ~300 iterations, but the first 40 models is discarded to allow proper mixing. (MCMC algorithm is guaranteed to converge for large number of steps n, but this n is usually not known) 
+Gibbs sampler is to be run for ~300 iterations, but the first 40 models is discarded to allow proper mixing. (Metropolis-Hasting MCMC algorithm is guaranteed to converge for large number of steps n, but this n is usually not known) 
 
 **References**
 1. Xiong - Bayesian prediction of tissue-regulated splicing using RNA sequence and cellular context https://academic.oup.com/bioinformatics/article/27/18/2554/182135

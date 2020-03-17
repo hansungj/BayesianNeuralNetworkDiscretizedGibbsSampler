@@ -1,33 +1,22 @@
 import tensorflow as tf
+import tensorflow_probability as tfp
+import numpy as np
+import pandas as pd
+
+import random
+import math
+import scipy
 import collections
 import time
-import numpy as np
-import tensorflow_probability as tfp
-import random
-
 
 import matplotlib.pyplot as plt 
 import seaborn as sns
-import math
-import scipy
 
-
-tfd = tfp.distributions
-tfb = tfp.bijectors
-tfpl = tfp.layers 
-tfkl = tf.keras.layers
-
-print('Import completed!')
-
-import warnings
-warnings.filterwarnings("ignore")
-
-!pip install synapseclient #incase
-
-import synapseclient
-import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
+
+
+
 
 def get_MixtureNormal_fn(mix, scale1, scale2):
     
@@ -56,42 +45,19 @@ def predict_Gibbs(Ws, Vs, test_x):
     return np.dot(act,Vs)
 
 
-# IMPORT DATA
-syn = synapseclient.Synapse()
-syn.login('userame','password')
- 
-#TRAINING DTA FILE PATH
-syn18634262 = syn.get(entity='syn18634262')
-filepath = syn18634262.path 
 
- #TEST DATA FILE PATH
-syn18634261 = syn.get(entity='syn18634261')
-test_filepath = syn18634261.path 
+tfd = tfp.distributions
+tfb = tfp.bijectors
+tfpl = tfp.layers 
+tfkl = tf.keras.layers
 
-#TRAINIG DATA PREPROCESSING
-data = pd.read_csv(filepath) 
-data.drop(['Sample_Name', 'Isolate','Timepoint', 'Treatment','BioRep'],axis=1, inplace=True)
-data.sort_values('DHA_IC50', inplace=True)
-target = data.DHA_IC50
-data.drop('DHA_IC50', inplace=True, axis=1)
+'''
+import data here
+data = pd.read_csv()
+test_data is created here as well
 
-y = np.expand_dims(target,1)
-
-#min max scaler
-scaler = MinMaxScaler()
-data = scaler.fit_transform(data)
-data = data.astype('float32')
-data = data - 0.5
-
-#TEST DATA PREPROCESSING
-test_data = pd.read_csv(test_filepath)
-test_labels = test_data[['Isolate','DHA_IC50']]
-test_data.drop(['Sample_Names','Isolate','Timepoint','Treatment', 'BioRep', 'DHA_IC50'],axis=1, inplace=True)
-test_data = scaler.transform(test_data)
-test_data = test_data.astype('float32')
-test_data = test_data - 0.5
-
-#input dim - fixed so that we dont need to define it as tensors
+'''
+#input dim 
 batch_size = data.shape[0]
 n_epoch = 200
 
@@ -117,11 +83,12 @@ kernel_prior_fn = get_MixtureNormal_fn(mix,std1**2,std2**2)
 kernel_prior_V_fn = get_MixtureNormal_fn(mix,std1**2,std2**2)
 likelihood_fn = get_Likelihood_fn(regression=True)
 
-#discretization 
+#discretization for first layer
 low = -5.0
 high = 5.0
 w_step = 0.1
 
+#discretization for second layer
 vlow = -5.0
 vhigh = 5.0
 v_step = 0.001
@@ -221,7 +188,6 @@ cols = np.arange(n_units)
 vs = np.arange(n_units)
 
 
-
 with tf.Session(graph=g) as sess:
     sess.run(init)
     
@@ -235,17 +201,23 @@ with tf.Session(graph=g) as sess:
         start = time.time()
         shuffle([rows,cols,vs]) # shuffle 
         
+        #sample from the first layer 
         for row in rows:
             for col in cols:
               W_ = sess.run(update_W, feed_dict = {i:row, j:col} )
+
+        #sample from the second layer
         for v in vs:
           V_, h_ = sess.run([update_V, h], feed_dict = {iv:v} )
         
         end = time.time()
         print('time taken {:3f}'.format(end- start))
         
+        #after waiting for the sampler to mix well ~100 burning steps
         if z >= n_burn:
-            test_labels['DHA_IC50'] = np.squeeze(predict_Gibbs(W_, V_, test_data))
-            test_labels.groupby('Isolate', as_index=False)['DHA_IC50'].mean().to_csv(path + "_{}".format(z), header=False)
+            prediction = predict_Gibbs(W_, V_, test_data)
+            '''
+            works with predictions here
 
+            '''
         z += 1
